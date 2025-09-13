@@ -1,7 +1,17 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import assets, { messagesDummyData } from '../assets/assets'
+import { formatMessageTime } from '../lib/utils'
 
 const ChatContainer = ({ selectedUser, setSelectedUser }) => {
+
+    const scrollEnd = useRef()
+
+    useEffect(() => {
+        if (scrollEnd.current) {
+            scrollEnd.current.scrollIntoView({ behavior: 'smooth' })
+        }
+    }, [formatMessageTime])
+
     return selectedUser ? (
         <div className='h-full overflow-scroll relative backdrop-blur-lg'>
             <div className='flex items-center gap-3 py-3 mx-4 border-b border-stone-500'>
@@ -35,13 +45,26 @@ const ChatContainer = ({ selectedUser, setSelectedUser }) => {
                             </p>
                         )}
                         <div className='text-center text-xs'>
-                            <img src={msg.senderId === '680f50e4f10f3cd28382ecf9' ? assets.avatar_icon : assets.profile_martin} alt="" 
-                            className='w-7 rounded-full'/>
-                            <p className='text-gray-500'>{msg.createdAt}</p>
+                            <img src={msg.senderId === '680f50e4f10f3cd28382ecf9' ? assets.avatar_icon : assets.profile_martin} alt=""
+                                className='w-7 rounded-full' />
+                            <p className='text-gray-500'>{formatMessageTime(msg.createdAt)}</p>
                         </div>
 
                     </div>
                 ))}
+                <div ref={scrollEnd}></div>
+            </div>
+            {/*---bottom area--*/}
+            <div className='flex items-center gap-3 p-3 border-t border-gray-500'>
+                <div className='flex-1 flex items-center bg-gray-100/20 px-3 rounded-full'>
+                    <input type="text" placeholder='send a message'
+                        className='flex-1 text-sm p-3 border-none rounded-lg outline-none text-white placeholder-gray-400' />
+                    <input type="file" id="image" accept='image/png, image/jpg' hidden />
+                    <label htmlFor='image'>
+                        <img src={assets.gallery_icon} alt="" className='w-5 mr-2 cursor-pointer' />
+                    </label>
+                </div>
+                <img src={assets.send_button} alt="" className='w-7 cursor-pointer' />
             </div>
         </div>
     ) : (
