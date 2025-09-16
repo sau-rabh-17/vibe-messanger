@@ -3,9 +3,9 @@ import Message from "../models/message.model.js";
 import User from "../models/user.models.js";
 import { userSocketMap, io } from "../server.js";
 
-export const getUserForSideBar = async() => {
+export const getUserForSideBar = async(req, res) => {
     try{
-        const userId = requestAnimationFrame.user._id;
+        const userId = req.user._id;
         const filteredUser = await User.find({_id: {$ne: userId}}).select("-password");
         const unseenMessages = {}
         const promises = filteredUser.map(async (user) => {
@@ -19,7 +19,7 @@ export const getUserForSideBar = async() => {
             }
         })
         await Promise.all(promises);
-        res.json({success: true, user: filteredUser, unseenMessages})
+        res.json({success: true, users: filteredUser, unseenMessages})
     }catch(err){
         console.log(err.messages)
         res.json({success: false, messages: err.messages})
@@ -74,11 +74,11 @@ export const sendMessage = async (req, res) => {
         const recieverId = req.params.id;
         const senderId = req.user._id;
         let imageUrl;
-        if(imageUrl){
+        if(image){
             const uploadResponse = await cloudinary.uploader.upload(image)
             imageUrl =uploadResponse.secure_url;
         }
-        const newMessage = Message.create({
+        const newMessage = await Message.create({
             senderId,
             recieverId,
             text,
