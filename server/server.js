@@ -12,8 +12,11 @@ const app = express();
 const server = http.createServer(app);
 
 export const io = new Server(server, {
-    cors: { origin: "*" }
-})
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
 export const userSocketMap = {};
 
