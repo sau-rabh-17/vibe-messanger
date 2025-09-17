@@ -12,7 +12,7 @@ const app = express();
 const server = http.createServer(app);
 
 export const io = new Server(server, {
-    cors: {origin: "*"}
+    cors: { origin: "*" }
 })
 
 export const userSocketMap = {};
@@ -20,22 +20,22 @@ export const userSocketMap = {};
 io.on("connection", (socket) => {
     const userId = socket.handshake.query.userId;
     console.log("User Connected", userId);
-    if(userId){
+    if (userId) {
         userSocketMap[userId] = socket.id;
     }
 
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
     socket.on("disconnect", () => {
         console.log("user disconnectd", userId);
-        delete userSocketMap[userId] ;
-        io.emit("getOnlineUsers", Object.keys(userSocketMap))  
+        delete userSocketMap[userId];
+        io.emit("getOnlineUsers", Object.keys(userSocketMap))
     })
 })
 
-app.use(express.json({limit: "4mb"}));
+app.use(express.json({ limit: "4mb" }));
 app.use(cors());
 
-app.use("/api/status", (req, res) =>{
+app.use("/api/status", (req, res) => {
     res.send("server is live");
 })
 app.use("/api/auth", userRouter)
@@ -43,8 +43,11 @@ app.use("/api/messages", messageRoutes)
 
 await connectDB();
 
-const PORT = process.env.PORT || 5000; 
+const PORT = process.env.PORT || 5000;
+if (process.env.NODE_ENV !== "production") {
+    server.listen(PORT, () => {
+        console.log(`server in running on port: ${PORT}`)
+    })
+}
 
-server.listen(PORT, () => {
-    console.log(`server in running on port: ${PORT}`)
-})
+export default server;
